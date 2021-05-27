@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-
+import com.magnustiberius.andrea.yacc.dao.Token;
 import com.magnustiberius.andrea.yacc.lexer.Tokenizer;
 
 @SpringBootTest
@@ -40,6 +40,7 @@ class YaccApplicationTests {
 	@Test
 	public void test1() throws IOException {
 	    String ID = tokenizer.add("plsql","/test.andreayacc");
+	    Token t = tokenizer.getNext();
 	    System.out.println("ID>>" + ID);
 	    //Assert.assertThat(data, containsString(expectedData));
 	}	
