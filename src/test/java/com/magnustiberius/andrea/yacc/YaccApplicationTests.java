@@ -16,7 +16,7 @@ import com.magnustiberius.andrea.yacc.lexer.Tokenizer;
 @SpringBootTest
 class YaccApplicationTests {
 
-	//@Autowired
+	@Autowired
 	Tokenizer tokenizer;
 	
 //	@Test
@@ -27,13 +27,20 @@ class YaccApplicationTests {
 	
 	@Test
 	public void givenFileNameAsAbsolutePath_whenUsingClasspath_thenFileData() throws IOException {
-		tokenizer = new Tokenizer();
+		//tokenizer = new Tokenizer();
 	    String expectedData = "Hello, world!";
 	    
 	    Class clazz = YaccApplicationTests.class;
 	    InputStream inputStream = clazz.getResourceAsStream("/test.andreayacc");
 	    String data = tokenizer.readFromInputStream(inputStream);
 
+	    //Assert.assertThat(data, containsString(expectedData));
+	}	
+
+	@Test
+	public void test1() throws IOException {
+	    String ID = tokenizer.add("plsql","/test.andreayacc");
+	    System.out.println("ID>>" + ID);
 	    //Assert.assertThat(data, containsString(expectedData));
 	}	
 	
