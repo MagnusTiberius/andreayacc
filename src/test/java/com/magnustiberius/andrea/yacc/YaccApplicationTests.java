@@ -25,7 +25,7 @@ class YaccApplicationTests {
 
 	
 	
-	@Test
+	//@Test
 	public void givenFileNameAsAbsolutePath_whenUsingClasspath_thenFileData() throws IOException {
 		//tokenizer = new Tokenizer();
 	    String expectedData = "Hello, world!";
@@ -41,13 +41,9 @@ class YaccApplicationTests {
 	public void test1() throws IOException {
 	    String ID = tokenizer.add("plsql","/test.andreayacc");
 	    Token t = tokenizer.getNext();
-	    t = tokenizer.getNext();
-	    t = tokenizer.getNext();
-	    t = tokenizer.getNext();
-	    t = tokenizer.getNext();
-	    t = tokenizer.getNext();
-	    t = tokenizer.getNext();
-	    t = tokenizer.getNext();
+	    while (t != null) {
+	    	t = tokenizer.getNext();
+	    }
 	    System.out.println("ID>>" + ID);
 	    //Assert.assertThat(data, containsString(expectedData));
 	}	

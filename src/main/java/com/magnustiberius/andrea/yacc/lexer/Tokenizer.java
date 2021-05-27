@@ -1,6 +1,9 @@
 package com.magnustiberius.andrea.yacc.lexer;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,15 +22,19 @@ public class Tokenizer {
 	Inventory inventory;
 	
 	int curptr;
-	String inputData;
-	char ch;
+	byte ch;
 	int line;
 	int col;
 	int scanPtr;
 	String alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 	String num = "0123456789";
+	String numdec = "0123456789.";
 	String alphanum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
-	String nonAlpha = ";:{}#@%<>.=|?*-!$&";
+	String nonAlpha = ";:{}#@%<>.=|?*-!$&'\",.`~()+^[]";
+	String ctlChar = "\r\n\t";
+	
+	byte[] inputData;
+	String inputData2;
 	
 	public String readFromInputStream(InputStream inputStream)
 	  throws IOException {
@@ -42,6 +49,17 @@ public class Tokenizer {
 	  return resultStringBuilder.toString();
 	}	
 	
+	public byte[] readFileBytes(String inputFile) throws IOException {
+		Class clazz = Tokenizer.class;
+		InputStream inputStream = clazz.getResourceAsStream(inputFile);
+		//InputStream inputStream = new FileInputStream(inputFile);
+		inputData = inputStream.readAllBytes();
+		//long fileSize = new File(inputFile).length();
+		//inputData = new byte[(int) fileSize];
+	//	inputStream.read(inputData);
+		return inputData;
+	}
+	
 	public void resetCounter() {
 	    curptr = 0;
 	    line = 0;
@@ -49,43 +67,70 @@ public class Tokenizer {
 	    scanPtr = 1;
 	}
 	
-	public String add(String ID, String fileName) throws IOException {
+	public String add2(String ID, String fileName) throws IOException {
 	    Class clazz = Tokenizer.class;
 	    InputStream inputStream = clazz.getResourceAsStream(fileName);
-	    inputData = readFromInputStream(inputStream);	
-	    inventory.add(ID, inputData);
+	    inputData2 = readFromInputStream(inputStream);	
+	    inventory.add(ID, inputData2);
+	    resetCounter();
+	    return ID;
+	}
+
+	public String add(String ID, String fileName) throws IOException {
+	    inputData = readFileBytes(fileName);	
+	    //inventory.add(ID, inputData);
 	    resetCounter();
 	    return ID;
 	}
 	
 	public Token getNext() {
-		ch = inputData.charAt(curptr);
-		while(inputData.charAt(curptr) == ' ' || inputData.charAt(curptr) == '\n' || inputData.charAt(curptr) == '\r') {
+		Token t = new Token();
+		ch = inputData[curptr];
+		while(ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t') {
+			if (ch == '\n' ) {
+				line++;
+			}
 			curptr++;
-			ch = inputData.charAt(curptr);
+			ch = inputData[curptr];
 		}
 
-		int i = nonAlpha.indexOf(ch);
+		int i = nonAlpha.indexOf((char)ch);
 		if (i != -1) {
-			curptr++;
-			ch = inputData.charAt(curptr);
-			i = nonAlpha.indexOf(ch);
-			return null;
+			scanPtr = curptr;
+			scanPtr++;
+			ch = inputData[scanPtr];
+			i = nonAlpha.indexOf((char)ch);
+			t.setBegin(curptr);
+			t.setEnd(scanPtr);
+			curptr = scanPtr;
+			t.setType("spec");
+			t.fill(inputData);
+			return t;
 		}		
-		
+
 		if (ch == '/') {
-			if (inputData.charAt(curptr+1) == '/') {
+			if (inputData[curptr+1] == '/') {
 				// a comment that will go until newline.
 				scanPtr = curptr + 1;
+				while(inputData[scanPtr] != '\n') {
+					scanPtr++;
+				}
 				System.out.println("curptr:" + curptr + " scanPtr:" + scanPtr);
+				curptr = scanPtr;
+				curptr++;
+				t.setBegin(curptr);
+				t.setEnd(scanPtr);
+				t.setType("comment");
+				t.fill(inputData);
+				return t;
 			}
-			if (inputData.charAt(curptr+1) == '*') {
+			if (inputData[curptr+1] == '*') {
 				// comment block, scan until end comment block is detected
-				ch = inputData.charAt(scanPtr);
+				ch = inputData[scanPtr];
 				Boolean keepGoing = true;
 				while (keepGoing) {
 					if (ch == '*') {
-						char ch2 = inputData.charAt(scanPtr+1);
+						byte ch2 = inputData[scanPtr+1];
 						if (ch2 == '/') {
 							keepGoing = false;
 							scanPtr++;
@@ -93,40 +138,73 @@ public class Tokenizer {
 						}
 					}
 					scanPtr++;
-					ch = inputData.charAt(scanPtr);
+					ch = inputData[scanPtr];
 				}
 				System.out.println("Done scanning comment >> curptr:" + curptr + " scanPtr:" + scanPtr);
+				t.setBegin(curptr);
+				t.setEnd(scanPtr);
+				t.setType("comment");
+				t.fill(inputData);
 				curptr = scanPtr;
 				curptr++;
+				return t;
 			}
-			return null;
-		}
-		
-		ch = inputData.charAt(curptr);
-		while(inputData.charAt(curptr) == ' ' || inputData.charAt(curptr) == '\n' || inputData.charAt(curptr) == '\r') {
-			curptr++;
-			ch = inputData.charAt(curptr);
-		}
-
-		if (alpha.indexOf(ch) > 0) {
-			scanPtr = curptr;
-			i = alpha.indexOf(ch);
-			while (i != -1)  {
-				scanPtr++;
-				ch = inputData.charAt(scanPtr);
-				i = alpha.indexOf(ch);
-			}
-			i = alphanum.indexOf(ch);
-			while (i != -1)  {
-				scanPtr++;
-				ch = inputData.charAt(scanPtr);
-				i = alphanum.indexOf(ch);
-			}
+			t.setBegin(curptr);
+			t.setEnd(scanPtr);
+			t.setType("slash");
+			t.fill(inputData);
 			curptr = scanPtr;
-			return null;
+			curptr++;
+			
+			return t;
 		}
 		
-		return null;
+		if (alpha.indexOf((char)ch) != -1) {
+			scanPtr = curptr;
+			i = alpha.indexOf((char)ch);
+			while (i != -1)  { // alpha
+				scanPtr++;
+				ch = inputData[scanPtr];
+				i = alpha.indexOf((char)ch);
+			}
+			i = alphanum.indexOf((char)ch);
+			while (i != -1)  { // alpha with number
+				scanPtr++;
+				ch = inputData[scanPtr];
+				i = alphanum.indexOf((char)ch);
+			}
+			t.setBegin(curptr);
+			t.setEnd(scanPtr);
+			t.setType("ident");
+			t.fill(inputData);
+			curptr = scanPtr;
+			return t;
+		}
+		
+		// number
+		if (num.indexOf((char)ch) != -1) {
+			scanPtr = curptr;
+			i = num.indexOf((char)ch);
+			while (i != -1)  { // number
+				scanPtr++;
+				ch = inputData[scanPtr];
+				i = num.indexOf(ch);
+			}
+			i = numdec.indexOf((char)ch);
+			while (i != -1)  { // number and dot
+				scanPtr++;
+				ch = inputData[scanPtr];
+				i = numdec.indexOf((char)ch);
+			}
+			t.setBegin(curptr);
+			t.setEnd(scanPtr);
+			curptr = scanPtr;
+			t.setType("number");
+			t.fill(inputData);
+			return t;
+		}		
+		
+		return t;
 	}
 	
 }
