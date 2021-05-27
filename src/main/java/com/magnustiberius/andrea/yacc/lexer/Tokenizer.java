@@ -98,13 +98,12 @@ public class Tokenizer {
 		if (i != -1) {
 			scanPtr = curptr;
 			scanPtr++;
-			ch = inputData[scanPtr];
-			i = nonAlpha.indexOf((char)ch);
 			t.setBegin(curptr);
 			t.setEnd(scanPtr);
-			curptr = scanPtr;
 			t.setType("spec");
+			t.setLine(line);
 			t.fill(inputData);
+			curptr = scanPtr;
 			return t;
 		}		
 
@@ -116,12 +115,13 @@ public class Tokenizer {
 					scanPtr++;
 				}
 				System.out.println("curptr:" + curptr + " scanPtr:" + scanPtr);
-				curptr = scanPtr;
-				curptr++;
 				t.setBegin(curptr);
 				t.setEnd(scanPtr);
 				t.setType("comment");
+				t.setLine(line);
 				t.fill(inputData);
+				curptr = scanPtr;
+				//curptr++;
 				return t;
 			}
 			if (inputData[curptr+1] == '*') {
@@ -129,6 +129,9 @@ public class Tokenizer {
 				ch = inputData[scanPtr];
 				Boolean keepGoing = true;
 				while (keepGoing) {
+					if (ch == '\n') {
+						line++;
+					}
 					if (ch == '*') {
 						byte ch2 = inputData[scanPtr+1];
 						if (ch2 == '/') {
@@ -144,6 +147,7 @@ public class Tokenizer {
 				t.setBegin(curptr);
 				t.setEnd(scanPtr);
 				t.setType("comment");
+				t.setLine(line);
 				t.fill(inputData);
 				curptr = scanPtr;
 				curptr++;
@@ -176,6 +180,7 @@ public class Tokenizer {
 			t.setBegin(curptr);
 			t.setEnd(scanPtr);
 			t.setType("ident");
+			t.setLine(line);
 			t.fill(inputData);
 			curptr = scanPtr;
 			return t;
@@ -200,6 +205,7 @@ public class Tokenizer {
 			t.setEnd(scanPtr);
 			curptr = scanPtr;
 			t.setType("number");
+			t.setLine(line);
 			t.fill(inputData);
 			return t;
 		}		

@@ -9,9 +9,10 @@ public class Token {
 	int end;
 	byte[] byteValue;
 	String strValue;
+	int line;
 	
 	public void fill(byte[] input) {
-		int sz = end - begin + 1;
+		int sz = end - begin;
 		byteValue = new byte[(int) sz];
 		int j = 0;
 		for(int i=begin; i<end; i++) {
@@ -19,9 +20,33 @@ public class Token {
 			j++;
 		}
 		strValue = new String(byteValue, StandardCharsets.UTF_8);
-		System.out.println("Token [" + begin + ", " + end + " ] " + strValue);
+		System.out.println("Token [" + begin + ", " + end + " ]  [line:" + line + "] [" + strValue + "]");
 	}
 	
+	public byte[] getByteValue() {
+		return byteValue;
+	}
+
+	public void setByteValue(byte[] byteValue) {
+		this.byteValue = byteValue;
+	}
+
+	public String getStrValue() {
+		return strValue;
+	}
+
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
+	}
+
+	public int getLine() {
+		return line;
+	}
+
+	public void setLine(int line) {
+		this.line = line-1;
+	}
+
 	public int getBegin() {
 		return begin;
 	}
