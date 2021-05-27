@@ -41,6 +41,13 @@ class YaccApplicationTests {
 	public void test1() throws IOException {
 	    String ID = tokenizer.add("plsql","/test.andreayacc");
 	    Token t = tokenizer.getNext();
+	    t = tokenizer.getNext();
+	    t = tokenizer.getNext();
+	    t = tokenizer.getNext();
+	    t = tokenizer.getNext();
+	    t = tokenizer.getNext();
+	    t = tokenizer.getNext();
+	    t = tokenizer.getNext();
 	    System.out.println("ID>>" + ID);
 	    //Assert.assertThat(data, containsString(expectedData));
 	}	

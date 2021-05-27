@@ -24,6 +24,10 @@ public class Tokenizer {
 	int line;
 	int col;
 	int scanPtr;
+	String alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+	String num = "0123456789";
+	String alphanum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
+	String nonAlpha = ";:{}#@%<>.=|?*-!$&";
 	
 	public String readFromInputStream(InputStream inputStream)
 	  throws IOException {
@@ -56,17 +60,23 @@ public class Tokenizer {
 	
 	public Token getNext() {
 		ch = inputData.charAt(curptr);
-		while(inputData.charAt(curptr) == ' ') {
+		while(inputData.charAt(curptr) == ' ' || inputData.charAt(curptr) == '\n' || inputData.charAt(curptr) == '\r') {
 			curptr++;
+			ch = inputData.charAt(curptr);
 		}
-		ch = inputData.charAt(curptr);
+
+		int i = nonAlpha.indexOf(ch);
+		if (i != -1) {
+			curptr++;
+			ch = inputData.charAt(curptr);
+			i = nonAlpha.indexOf(ch);
+			return null;
+		}		
+		
 		if (ch == '/') {
 			if (inputData.charAt(curptr+1) == '/') {
 				// a comment that will go until newline.
 				scanPtr = curptr + 1;
-				while (inputData.charAt(scanPtr) != '\r' || inputData.charAt(scanPtr) != '\n') {
-					scanPtr++;
-				}
 				System.out.println("curptr:" + curptr + " scanPtr:" + scanPtr);
 			}
 			if (inputData.charAt(curptr+1) == '*') {
@@ -78,6 +88,7 @@ public class Tokenizer {
 						char ch2 = inputData.charAt(scanPtr+1);
 						if (ch2 == '/') {
 							keepGoing = false;
+							scanPtr++;
 							break;
 						}
 					}
@@ -85,8 +96,36 @@ public class Tokenizer {
 					ch = inputData.charAt(scanPtr);
 				}
 				System.out.println("Done scanning comment >> curptr:" + curptr + " scanPtr:" + scanPtr);
+				curptr = scanPtr;
+				curptr++;
 			}
+			return null;
 		}
+		
+		ch = inputData.charAt(curptr);
+		while(inputData.charAt(curptr) == ' ' || inputData.charAt(curptr) == '\n' || inputData.charAt(curptr) == '\r') {
+			curptr++;
+			ch = inputData.charAt(curptr);
+		}
+
+		if (alpha.indexOf(ch) > 0) {
+			scanPtr = curptr;
+			i = alpha.indexOf(ch);
+			while (i != -1)  {
+				scanPtr++;
+				ch = inputData.charAt(scanPtr);
+				i = alpha.indexOf(ch);
+			}
+			i = alphanum.indexOf(ch);
+			while (i != -1)  {
+				scanPtr++;
+				ch = inputData.charAt(scanPtr);
+				i = alphanum.indexOf(ch);
+			}
+			curptr = scanPtr;
+			return null;
+		}
+		
 		return null;
 	}
 	
