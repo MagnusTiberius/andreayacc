@@ -42,7 +42,7 @@ class YaccApplicationTests {
 	    String ID = tokenizer.add("plsql","/test.andreayacc");
 	    int i = 0;
 	    Token t = tokenizer.getNext();
-	    while (t != null && i < 100) {
+	    while (t != null && i < 100000) {
 	    	t = tokenizer.getNext();
 	    	i++;
 	    }
