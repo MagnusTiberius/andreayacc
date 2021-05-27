@@ -38,7 +38,7 @@ unit_statement
     | alter_cluster
     | alter_database
     | alter_function
-    | alter_package
+    | alter_package /* this is a comment */
     | alter_procedure
     | alter_sequence
     | alter_session

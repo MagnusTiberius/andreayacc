@@ -137,6 +137,7 @@ public class Tokenizer {
 						if (ch2 == '/') {
 							keepGoing = false;
 							scanPtr++;
+							scanPtr++;
 							break;
 						}
 					}

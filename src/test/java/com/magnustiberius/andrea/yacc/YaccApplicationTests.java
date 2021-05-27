@@ -40,9 +40,11 @@ class YaccApplicationTests {
 	@Test
 	public void test1() throws IOException {
 	    String ID = tokenizer.add("plsql","/test.andreayacc");
+	    int i = 0;
 	    Token t = tokenizer.getNext();
-	    while (t != null) {
+	    while (t != null && i < 100) {
 	    	t = tokenizer.getNext();
+	    	i++;
 	    }
 	    System.out.println("ID>>" + ID);
 	    //Assert.assertThat(data, containsString(expectedData));
