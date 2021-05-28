@@ -10,6 +10,7 @@ public class Token {
 	byte[] byteValue;
 	String strValue;
 	int line;
+	long filesize;
 	
 	public void fill(byte[] input) {
 		int sz = end - begin;
@@ -20,9 +21,17 @@ public class Token {
 			j++;
 		}
 		strValue = new String(byteValue, StandardCharsets.UTF_8);
-		System.out.println("Token [" + begin + ", " + end + " ]  [line:" + line + "] [" + strValue + "]");
+		System.out.println("Token [" + begin + ", " + end + ", " + filesize + "]  [line:" + line + "] [" + strValue + "]");
 	}
 	
+	public long getFilesize() {
+		return filesize;
+	}
+
+	public void setFilesize(long filesize) {
+		this.filesize = filesize;
+	}
+
 	public byte[] getByteValue() {
 		return byteValue;
 	}

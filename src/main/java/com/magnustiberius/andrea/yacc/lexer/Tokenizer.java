@@ -32,7 +32,7 @@ public class Tokenizer {
 	String alphanum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
 	String nonAlpha = ";:{}#@%<>.=|?*-!$&'\",.`~()+^[]\\";
 	String ctlChar = "\r\n\t";
-	
+	long fileSize;
 	byte[] inputData;
 	String inputData2;
 	
@@ -54,6 +54,7 @@ public class Tokenizer {
 		InputStream inputStream = clazz.getResourceAsStream(inputFile);
 		//InputStream inputStream = new FileInputStream(inputFile);
 		inputData = inputStream.readAllBytes();
+		fileSize = inputData.length;
 		//long fileSize = new File(inputFile).length();
 		//inputData = new byte[(int) fileSize];
 	//	inputStream.read(inputData);
@@ -106,6 +107,10 @@ public class Tokenizer {
 				line++;
 			}
 			curptr++;
+			if(fileSize <= scanPtr) {
+				System.out.println("DONE -----------------1------------------");
+				return null;
+			}
 			ch = nextChar();
 		}
 
@@ -117,7 +122,12 @@ public class Tokenizer {
 			t.setEnd(scanPtr);
 			t.setType("spec");
 			t.setLine(line);
+			t.setFilesize(fileSize);
 			t.fill(inputData);
+			if(fileSize <= scanPtr) {
+				System.out.println("DONE ------------------2-----------------");
+				return null;
+			}
 			setCurrentPointerFromScan();
 			return t;
 		}		
@@ -133,6 +143,7 @@ public class Tokenizer {
 				t.setEnd(scanPtr-2);
 				t.setType("comment");
 				t.setLine(line);
+				t.setFilesize(fileSize);
 				t.fill(inputData);
 				setCurrentPointerFromScan();
 				return t;
@@ -161,6 +172,7 @@ public class Tokenizer {
 				t.setEnd(scanPtr);
 				t.setType("comment");
 				t.setLine(line);
+				t.setFilesize(fileSize);
 				t.fill(inputData);
 				setCurrentPointerFromScan();
 				curptr++;
@@ -169,6 +181,7 @@ public class Tokenizer {
 			t.setBegin(curptr);
 			t.setEnd(scanPtr);
 			t.setType("slash");
+			t.setFilesize(fileSize);
 			t.fill(inputData);
 			curptr = scanPtr;
 			curptr++;
@@ -192,6 +205,7 @@ public class Tokenizer {
 			t.setEnd(scanPtr-1);
 			t.setType("ident");
 			t.setLine(line);
+			t.setFilesize(fileSize);
 			t.fill(inputData);
 			setCurrentPointerFromScan();
 			return t;
@@ -215,6 +229,7 @@ public class Tokenizer {
 			setCurrentPointerFromScan();
 			t.setType("number");
 			t.setLine(line);
+			t.setFilesize(fileSize);
 			t.fill(inputData);
 			return t;
 		}		
