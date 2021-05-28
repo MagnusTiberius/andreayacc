@@ -49,5 +49,32 @@ class YaccApplicationTests {
 	    System.out.println("ID>>" + ID);
 	    //Assert.assertThat(data, containsString(expectedData));
 	}	
+
+	@Test
+	public void test_plsql() throws IOException {
+	    String ID = tokenizer.add("plsql","/tsql.andreayacc");
+	    int i = 0;
+	    Token t = tokenizer.getNext();
+	    while (t != null && i < 100000) {
+	    	t = tokenizer.getNext();
+	    	i++;
+	    }
+	    System.out.println("ID>>" + ID);
+	    //Assert.assertThat(data, containsString(expectedData));
+	}	
+
+	@Test
+	public void test_tsqllexer() throws IOException {
+	    String ID = tokenizer.add("plsql","/tsqllexer.andreayacc");
+	    int i = 0;
+	    Token t = tokenizer.getNext();
+	    while (t != null && i < 100000) {
+	    	t = tokenizer.getNext();
+	    	i++;
+	    }
+	    System.out.println("ID>>" + ID);
+	    //Assert.assertThat(data, containsString(expectedData));
+	}	
+	
 	
 }

@@ -30,7 +30,7 @@ public class Tokenizer {
 	String num = "0123456789";
 	String numdec = "0123456789.";
 	String alphanum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
-	String nonAlpha = ";:{}#@%<>.=|?*-!$&'\",.`~()+^[]";
+	String nonAlpha = ";:{}#@%<>.=|?*-!$&'\",.`~()+^[]\\";
 	String ctlChar = "\r\n\t";
 	
 	byte[] inputData;
@@ -57,6 +57,7 @@ public class Tokenizer {
 		//long fileSize = new File(inputFile).length();
 		//inputData = new byte[(int) fileSize];
 	//	inputStream.read(inputData);
+		resetCounter();
 		return inputData;
 	}
 	
@@ -83,15 +84,29 @@ public class Tokenizer {
 	    return ID;
 	}
 	
+	public byte nextChar() {
+		return inputData[curptr];
+	}
+
+	public byte scanChar() {
+		byte b = inputData[scanPtr];
+		scanPtr++;
+		return b;
+	}
+	
+	public void setCurrentPointerFromScan() {
+		curptr = scanPtr;
+	}
+	
 	public Token getNext() {
 		Token t = new Token();
-		ch = inputData[curptr];
+		ch = nextChar();
 		while(ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t') {
 			if (ch == '\n' ) {
 				line++;
 			}
 			curptr++;
-			ch = inputData[curptr];
+			ch = nextChar();
 		}
 
 		int i = nonAlpha.indexOf((char)ch);
@@ -103,7 +118,7 @@ public class Tokenizer {
 			t.setType("spec");
 			t.setLine(line);
 			t.fill(inputData);
-			curptr = scanPtr;
+			setCurrentPointerFromScan();
 			return t;
 		}		
 
@@ -111,38 +126,35 @@ public class Tokenizer {
 			if (inputData[curptr+1] == '/') {
 				// a comment that will go until newline.
 				scanPtr = curptr + 1;
-				while(inputData[scanPtr] != '\n') {
-					scanPtr++;
+				while(scanChar() != '\n') {
 				}
 				System.out.println("curptr:" + curptr + " scanPtr:" + scanPtr);
 				t.setBegin(curptr);
-				t.setEnd(scanPtr);
+				t.setEnd(scanPtr-2);
 				t.setType("comment");
 				t.setLine(line);
 				t.fill(inputData);
-				curptr = scanPtr;
-				//curptr++;
+				setCurrentPointerFromScan();
 				return t;
 			}
 			if (inputData[curptr+1] == '*') {
 				// comment block, scan until end comment block is detected
-				ch = inputData[scanPtr];
+				ch = scanChar();
 				Boolean keepGoing = true;
 				while (keepGoing) {
 					if (ch == '\n') {
 						line++;
 					}
+					char c1 = (char)ch;
 					if (ch == '*') {
-						byte ch2 = inputData[scanPtr+1];
+						byte ch2 = inputData[scanPtr];
+						char c2 = (char)ch2;
 						if (ch2 == '/') {
 							keepGoing = false;
-							scanPtr++;
-							scanPtr++;
 							break;
 						}
 					}
-					scanPtr++;
-					ch = inputData[scanPtr];
+					ch = scanChar();
 				}
 				System.out.println("Done scanning comment >> curptr:" + curptr + " scanPtr:" + scanPtr);
 				t.setBegin(curptr);
@@ -150,7 +162,7 @@ public class Tokenizer {
 				t.setType("comment");
 				t.setLine(line);
 				t.fill(inputData);
-				curptr = scanPtr;
+				setCurrentPointerFromScan();
 				curptr++;
 				return t;
 			}
@@ -168,22 +180,20 @@ public class Tokenizer {
 			scanPtr = curptr;
 			i = alpha.indexOf((char)ch);
 			while (i != -1)  { // alpha
-				scanPtr++;
-				ch = inputData[scanPtr];
+				ch = scanChar();
 				i = alpha.indexOf((char)ch);
 			}
 			i = alphanum.indexOf((char)ch);
 			while (i != -1)  { // alpha with number
-				scanPtr++;
-				ch = inputData[scanPtr];
+				ch = scanChar();
 				i = alphanum.indexOf((char)ch);
 			}
 			t.setBegin(curptr);
-			t.setEnd(scanPtr);
+			t.setEnd(scanPtr-1);
 			t.setType("ident");
 			t.setLine(line);
 			t.fill(inputData);
-			curptr = scanPtr;
+			setCurrentPointerFromScan();
 			return t;
 		}
 		
@@ -192,19 +202,17 @@ public class Tokenizer {
 			scanPtr = curptr;
 			i = num.indexOf((char)ch);
 			while (i != -1)  { // number
-				scanPtr++;
-				ch = inputData[scanPtr];
+				ch = scanChar();
 				i = num.indexOf(ch);
 			}
 			i = numdec.indexOf((char)ch);
 			while (i != -1)  { // number and dot
-				scanPtr++;
-				ch = inputData[scanPtr];
+				ch = scanChar();
 				i = numdec.indexOf((char)ch);
 			}
 			t.setBegin(curptr);
 			t.setEnd(scanPtr);
-			curptr = scanPtr;
+			setCurrentPointerFromScan();
 			t.setType("number");
 			t.setLine(line);
 			t.fill(inputData);
