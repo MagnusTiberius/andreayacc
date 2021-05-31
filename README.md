@@ -18,6 +18,11 @@
 ## Developers
 * Ben Gonzales
 
+## Build
+* mvn clean package
+* java -jar target\yacc-0.0.1-SNAPSHOT.jar
+* navigate to https://localhost:8080/index
+
 ## Links
 * https://www.tutorialspoint.com/spring_boot/spring_boot_thymeleaf.htm
 * https://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-grid-system.php
