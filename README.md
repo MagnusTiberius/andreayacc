@@ -17,3 +17,7 @@
 
 ## Developers
 * Ben Gonzales
+
+## Links
+* https://www.tutorialspoint.com/spring_boot/spring_boot_thymeleaf.htm
+* https://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-grid-system.php
